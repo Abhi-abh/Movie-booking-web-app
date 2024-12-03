@@ -1,0 +1,46 @@
+{% extends 'User/base.html' %}
+{% block content %}
+{% load static %}
+
+<br><br>
+
+<div class="container">
+  <div class="row">
+      <!-- Order Summary Section -->
+      {% for booking in bookings %}
+      {% if forloop.last %}  
+      <div class="contanier summary bg-light p-3 ms-3 mt-5 col-md-6">
+        <h4>ORDER SUMMARY</h4>
+        <hr>
+        <img src="{{ booking.movie.image.url }}" alt="" style="height: 300px;width: 200px;">
+        <p><b>Title:{{ booking.movie.title }}</b></p>
+        <p><b>Show Time:{{ booking.time }}</b></p>
+        <p><b>Seats:{{ booking.seats }}</b></p>
+        <p><b>Total:{{ booking.total_price }}</b></p>
+        
+        <hr>
+        <p>By proceeding, I express my consent to complete this transaction</p>
+    </div>
+    {% endif %}
+    {% endfor %}
+    <div class="payment text-center col-md-6">
+      <form action="" method="POST">
+          {% csrf_token %}
+          <h2 class="text-black">Card Details</h2>
+          <input type="number" name="cardNo" maxlength="10" placeholder="Card Number" required>
+          <br>   
+          <input type="text" name="name" placeholder="Name on the Card" required>
+         <br>     
+          <input type="number" maxlength="2" id="small" name="month" placeholder="MM" required>
+          <input type="number" id="small" maxlength="2" name="year" placeholder="YY" required>
+          <br>
+          <input type="password" name="ccv" maxlength="3" placeholder="CCV" required>
+
+          <button type="submit" value="submit">Make Payment</button>
+
+      </form>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

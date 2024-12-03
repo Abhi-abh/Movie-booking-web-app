@@ -1,0 +1,24 @@
+{% extends 'User/base.html' %}
+{% block content %}
+{% load static %}
+
+<div class="container-fluid mt-5 m-auto">
+    <img  src="{% static '/images/image 86.png' %}" style="width: 100%;" alt="">
+    <div style="display: inline-block;" class="container mt-5 mb-5 text-center" >
+        <h5 class="text-white">ABOUT US</h5>
+        <h1 class="text-white">Welcome to Smart Movie Booking App - Your Smart <br> Solution for Movie Booking!</h1>
+    </div>
+</div>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 col-12 justify-content-center">
+            <img src="{% static '/images/image 88.png' %}" style="height: auto;width: 95%;" alt="">
+        </div>
+        <div class="col-md-6 col-12 justify-content-center">
+            <h3 class="text-white">Our Mission</h3>
+            <h4 class="text-white">Our mission is simple!</h4>
+            <p class="text-white">To enhance every part of your movie-going experience. By combining <br> technology with a passion for cinema, we've built an app that caters to your <br> needs—giving you more time to relax and enjoy the magic on the big screen.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

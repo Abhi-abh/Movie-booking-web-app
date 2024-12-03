@@ -1,0 +1,32 @@
+{% extends 'User/base.html' %}
+{% block content %}
+{% load static %}
+
+<br><br>
+  <div class="container mt-5">
+    <div class="container text-center mt-5">
+        <h1 class=" text-white">Your Bookings</h1>
+      </div>
+     
+    <div class="row">
+      {% for booking in bookings %}
+    <div class="col-md-4 col-lg-3 col-6 justify-content-center">
+      <div class="card mt-3 " style="width: 12rem;">
+        <img src="{{ booking.movie.image.url }}" alt="" style="height: 300px;width: 190px;">
+          <div class="card-body">
+            <h3 class="card-title text-center bg-danger" style="border-radius: 5%;" >Booked</h3>
+            <h5 class="card-title">Date: {{ booking.date }}</h5>
+            <h5 class="card-title">Time: {{ booking.time }}</h5>
+            <h5 class="card-title">Seats: {{ booking.seats }}</h5>
+            <h5 class="card-title">Total: {{ booking.total_price }}</h5>
+            <a href="{% url 'ticket' booking.id %}"><button class="bg-warning">Show Ticket</button></a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+   
+  </div>
+  
+
+{% endblock %}

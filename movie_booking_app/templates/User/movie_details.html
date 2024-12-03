@@ -1,0 +1,87 @@
+{% extends 'User/base.html' %}
+{% block content %}
+{% load static %}
+
+<br>
+<div class="container-fluid mt-5 fw-bold" style="background-image: url('{{product.cover_image.url}}');">
+    <div class="container mt-5 mb-5 col-md-6">
+        <img class="hover-effect" src="{{product.image.url}}" style="width: 194px;height: 291.28px;flex-shrink: 0;" alt="...">
+        <div class="text-white" style="display: inline-block; vertical-align: top; margin-left: 10px;">
+            <h2 class="bg-light text-dark">{{product.title}}</h2>
+            <h5  class="bg-light text-dark">{{product.formats}}</h5>
+            <h5  class="bg-light text-dark">{{product.year}}</h5>
+            <h5 class="bg-light text-dark">{{product.duration}}</h5>
+            <h4  class="bg-light text-dark">{{product.language}}</h4>
+            <a href="#booking"><button style="border-radius: 10px;width: 20rem;height: 3rem;" class="bg-danger mb-5 text-white">Book Tickets</button></a>
+        </div>
+      </div>          
+    </div>
+<div class="container">
+    <h2 class="text-white">About Movie</h2>
+    <p class="text-white">{{product.description}}</p>
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+    <h2 class="text-white">Cast</h2>
+    <p class="text-white">{{product.cast}}</p>
+</div>
+<div class="col-md-6">
+    <iframe width="560" height="315" src="{{product.link}}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+</div>
+</div>
+<div id="booking" class="div container fw-bold mt-5 mb-5 w-50 bg-light" style="border-radius: 5px;">
+    <form action="{% url 'booking' %}" method="post">
+        {% csrf_token %} 
+        <div class="text-center mt-5">
+            <h2>Booking Form</h2>
+        </div>
+        <div data-mdb-input-init class="form-outline mb-4">
+            <label class="form-label">Booking Date</label>
+            <input class="form-control" type="date" placeholder="Date" name="Date" required>
+        </div>
+        <div data-mdb-input-init class="form-outline mb-4">
+            <label class="form-label">Seats</label>
+            <input class="form-control" type="number" placeholder="number" name="number" min="1" required>
+        </div>
+        <div data-mdb-input-init class="form-outline mb-4">
+            <label class="form-label">Booking Time</label>
+            <select class="form-control" name="Time" required>
+                <option value="">--Please choose a Time--</option>
+                <option value="11-30 am">11-30 am</option>
+                <option value="2-30 pm">2-30 pm</option>
+                <option value="5-00 pm">5-00 pm</option>
+                <option value="9-00 pm">9-00 pm</option>
+            </select>
+        </div>
+        <input type="hidden" name="movie_id" value="{{ product.id }}">
+        <a href="{% url 'payment' %}"><button class="btn btn-primary btn-block mb-4 w-20">Book Now</button></a>
+    </form>
+</div>
+
+<!-- Now Running movies -->
+<section class="movies text-white" id="movies">
+  <hr class="bg-danger">
+  <h2 class="heading">Now Running movies</h2>
+  
+  <!-- coming contanier  -->
+  <div class="movies-container">
+    <!-- box-1  -->
+    {% for product in latest_list %}
+    <div class="box">
+        <div class="box-img">
+            <a href="{% url 'movie_dlt' product.id %}"><img src="{{product.image.url}}" alt=""></a>
+        </div>
+        <h3>{{product.title}}</h3>
+        <h3>{{product.price}}</h3>
+        <span>{{product.duration}}</span>
+    </div>
+    {% endfor %}      
+</div>
+</section>
+
+      
+  
+
+{% endblock %}
