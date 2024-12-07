@@ -5,6 +5,8 @@ from django.contrib import messages
 from django.contrib.auth import authenticate,logout
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
+from django.utils.timezone import now
+from datetime import datetime
 import re
 
 # Create your views here.
@@ -89,17 +91,33 @@ def movie_dlt(request,pk):
 
 def booking(request):
     if request.method == 'POST':
-        user=request.user
-        customer=user.customer_profile
+        user = request.user
+        customer = user.customer_profile
         movie_id = request.POST.get('movie_id')  # Pass the movie_id in the form
         movie = get_object_or_404(Movie, id=movie_id)
         seats = int(request.POST.get('number'))
-        total_price = seats * movie.price  # Calculate total price based on seats
+        selected_date = request.POST.get('Date')  # Date input from the form
+        current_date = now().date()  # Current date from timezone
 
+        try:
+            selected_date_obj = datetime.strptime(selected_date, '%Y-%m-%d').date()
+        except ValueError:
+            messages.error(request, "Invalid date format. Please use YYYY-MM-DD.")
+            return render(request, 'User/booking.html')
+
+        # Check if the selected date is not in the past
+        if selected_date_obj < current_date:
+            messages.error(request, "You cannot book for past dates.")
+            return render(request, 'User/booking.html')
+
+        # Calculate total price based on seats
+        total_price = seats * movie.price
+
+        # Create a booking object
         payment_obj = Bookings.objects.create(
             owner=customer,
             movie=movie,
-            date=request.POST.get('Date'),
+            date=selected_date,
             seats=seats,
             time=request.POST.get('Time'),
             total_price=total_price,
