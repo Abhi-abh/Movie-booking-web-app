@@ -6,7 +6,7 @@
 <div class="container mt-5 w-50 d-flex justify-content-center align-items-center flex-column">
 <h2 class="success">Your Booking has confirmed</h2>
 </div>
-    <div class="container ticket">
+    <div id="content" class="container ticket">
         <div class="ticket-img">
             <img src="{{ticket.movie.image.url}}">
         </div>
@@ -19,7 +19,7 @@
         <p>Tickets:{{ticket.seats}}</p>
         <p>Total Price:{{ticket.total_price}}</p>
 
-        <img id="water"src="{% static 'Images/Qrcode.png' %}">
+        <img id="water"src="{{ticket.qr_code.url}}">
         <img id="booked" src="{% static 'images/booked.png' %}">
         <div class="dot1"></div>
         <div class="dot2"></div>
@@ -30,6 +30,24 @@
         <div class="dot7"></div>
         
     </div>
+    <div>
+        <button id="cmd">generate PDF</button>
+    </div>
+<script>
+    var doc = new jsPDF();
+var specialElementHandlers = {
+    '#editor': function (element, renderer) {
+        return true;
+    }
+};
 
+$('#cmd').click(function () {
+    doc.fromHTML($('#content').html(), 15, 15, {
+        'width': 170,
+            'elementHandlers': specialElementHandlers
+    });
+    doc.save('sample-file.pdf');
+});
+</script>
 
 {% endblock %}

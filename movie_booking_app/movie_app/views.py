@@ -8,6 +8,9 @@ from django.contrib.auth.decorators import login_required
 from django.utils.timezone import now
 from datetime import datetime
 import re
+import qrcode
+from io import BytesIO
+from django.core.files.base import ContentFile
 
 # Create your views here.
 
@@ -88,16 +91,26 @@ def movie_dlt(request,pk):
     return render(request,'User/movie_details.html',context)
 
 
-
 def booking(request):
     if request.method == 'POST':
         user = request.user
-        customer = user.customer_profile
-        movie_id = request.POST.get('movie_id')  # Pass the movie_id in the form
-        movie = get_object_or_404(Movie, id=movie_id)
-        seats = int(request.POST.get('number'))
-        selected_date = request.POST.get('Date')  # Date input from the form
-        current_date = now().date()  # Current date from timezone
+        customer = getattr(user, 'customer_profile', None)  # Safely access customer_profile
+
+        if not customer:
+            messages.error(request, "Customer profile not found.")
+            return render(request, 'User/booking.html')
+
+        movie_id = request.POST.get('movie_id')  # Get movie_id from the form
+        movie = get_object_or_404(Movie, id=movie_id)  # Fetch movie object safely
+        seats = request.POST.get('number')
+
+        if not seats or not seats.isdigit():
+            messages.error(request, "Invalid number of seats.")
+            return render(request, 'User/booking.html')
+
+        seats = int(seats)
+        selected_date = request.POST.get('Date')  # Get date from the form
+        current_date = now().date()  # Get current date
 
         try:
             selected_date_obj = datetime.strptime(selected_date, '%Y-%m-%d').date()
@@ -105,15 +118,15 @@ def booking(request):
             messages.error(request, "Invalid date format. Please use YYYY-MM-DD.")
             return render(request, 'User/booking.html')
 
-        # Check if the selected date is not in the past
+        # Validate selected date
         if selected_date_obj < current_date:
             messages.error(request, "You cannot book for past dates.")
             return render(request, 'User/booking.html')
 
-        # Calculate total price based on seats
+        # Calculate total price
         total_price = seats * movie.price
 
-        # Create a booking object
+        # Create the Booking object without the QR code first
         payment_obj = Bookings.objects.create(
             owner=customer,
             movie=movie,
@@ -122,11 +135,39 @@ def booking(request):
             time=request.POST.get('Time'),
             total_price=total_price,
         )
-        if payment_obj:
-            payment_obj.save()
-            return redirect('payment')
+
+        # Generate QR code data
+        combined_data = (
+            f"Movie: {movie.title}\n"
+            f"Tickets: {seats}\n"
+            f"Date: {selected_date}\n"
+            f"Time: {request.POST.get('Time')}"
+        )
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=3,
+            border=4,
+        )
+        qr.add_data(combined_data)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+
+        # Save QR code to in-memory buffer
+        buffer = BytesIO()
+        img.save(buffer)
+        buffer.seek(0)
+
+        # Save QR code to the qr_code field
+        filename = f"qr_{movie.title[:10]}_{user.id}_{payment_obj.id}.png"
+        payment_obj.qr_code.save(filename, ContentFile(buffer.getvalue()))
+        payment_obj.save()
+
+        # Redirect to the payment page
+        return redirect('payment')
 
     return render(request, 'User/booking.html')
+
 
 
 def payment(request):

@@ -35,6 +35,7 @@ class Customer(models.Model):
      return str(self.user)
 
 class Bookings(models.Model):
+    qr_code = models.ImageField(upload_to='qr_codes/',null=True)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, null=True,related_name="bookings")
     total_price = models.FloatField(default=0)
     owner = models.ForeignKey(Customer,on_delete=models.SET_NULL,null=True,related_name='bookings')
