@@ -47,9 +47,6 @@ class Bookings(models.Model):
     def __str__(self):
         return "order-{}-{}".format(self.id,self.owner)
 
-class OrededItem(models.Model):
-    product = models.ForeignKey(Movie,related_name='added_carts',on_delete=models.SET_NULL,null=True)
-    owner = models.ForeignKey(Bookings,on_delete=models.CASCADE,related_name='added_items')
 
 class Payment(models.Model):
     card_name = models.CharField(max_length=250)

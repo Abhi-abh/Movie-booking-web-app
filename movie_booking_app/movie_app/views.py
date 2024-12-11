@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect, get_object_or_404
-from .models import Movie,Bookings,OrededItem,Customer,Payment,Contact
+from .models import Movie,Bookings,Customer,Payment,Contact
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate,logout
@@ -56,7 +56,7 @@ def login(request):
             return redirect('login')
     return render(request,'User/login.html')
 
-@login_required(login_url='login')
+
 def home(request):
     movie_list = Movie.objects.order_by('priority')
     movie_dict = {'product':movie_list}
@@ -77,6 +77,7 @@ def contact(request):
 def about(request):
     return render(request,'User/about.html')
 
+@login_required(login_url='login')
 def order(request):
     user=request.user
     customer=user.customer_profile
@@ -90,7 +91,7 @@ def movie_dlt(request,pk):
     context={'product':product,'latest_list':latest_list}
     return render(request,'User/movie_details.html',context)
 
-
+@login_required(login_url='login')
 def booking(request):
     if request.method == 'POST':
         user = request.user
@@ -141,7 +142,8 @@ def booking(request):
             f"Movie: {movie.title}\n"
             f"Tickets: {seats}\n"
             f"Date: {selected_date}\n"
-            f"Time: {request.POST.get('Time')}"
+            f"Time: {request.POST.get('Time')}\n"
+            f"Total: {total_price}"
         )
         qr = qrcode.QRCode(
             version=1,
@@ -169,7 +171,7 @@ def booking(request):
     return render(request, 'User/booking.html')
 
 
-
+@login_required(login_url='login')
 def payment(request):
     user = request.user
     customer = user.customer_profile
@@ -191,17 +193,16 @@ def payment(request):
     return render(request, 'User/payment.html', {'bookings': bookings})
 
 
-
+@login_required(login_url='login')
 def ticket(request,pk):
     ticket=Bookings.objects.get(pk=pk)
     context={'ticket':ticket}
     return render(request,'User/ticket.html',context)
 
+@login_required(login_url='login')
 def confirmpage(request):
     return render(request,'User/confirmationpage.html')
 
 def loggout(request):
     logout(request)
     return redirect('login')
-
-
