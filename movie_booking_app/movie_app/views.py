@@ -193,6 +193,16 @@ def payment(request):
     return render(request, 'User/payment.html', {'bookings': bookings})
 
 
+def delete(request,id):
+    instance=Bookings.objects.get(pk=id)
+    instance.delete()
+    if request.method == 'POST':
+        return redirect('home')
+    dict_insert = {
+        'insert' : Bookings.objects.all()
+    }
+    return render(request,'User/payment.html',dict_insert)
+
 @login_required(login_url='login')
 def ticket(request,pk):
     ticket=Bookings.objects.get(pk=pk)
