@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect, get_object_or_404
-from .models import Movie,Bookings,Customer,Payment,Contact
+from .models import Movie,UpcomingMovies,Bookings,Customer,Payment,Contact
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate,logout
@@ -59,7 +59,8 @@ def login(request):
 
 def home(request):
     movie_list = Movie.objects.order_by('priority')
-    movie_dict = {'product':movie_list}
+    up_movies = UpcomingMovies.objects.all()
+    movie_dict = {'product':movie_list,'upmovies':up_movies}
     return render(request,'User/home.html',movie_dict)
 
 def contact(request):
@@ -81,7 +82,7 @@ def about(request):
 def order(request):
     user=request.user
     customer=user.customer_profile
-    bookings = Bookings.objects.filter(owner=customer)  # Use select_related for efficiency
+    bookings = Payment.objects.filter(owner=customer)   # Use select_related for efficiency
     context = {'bookings': bookings}
     return render(request,'User/orders.html',context)
 
@@ -170,38 +171,48 @@ def booking(request):
 
     return render(request, 'User/booking.html')
 
+@login_required
+def profile_view(request):
+    user = request.user  # Get the currently logged-in user
+    return render(request, 'User/profile.html', {'user': user})
 
 @login_required(login_url='login')
 def payment(request):
-    user = request.user
-    customer = user.customer_profile
-    bookings = Bookings.objects.filter(owner=customer)  # Ensure `bookings` is always initialized
+    # Initialize `bookings` as an empty QuerySet or `None` to handle both POST and GET requests
+    bookings = None
 
     if request.method == 'POST':
+        user = request.user
+        customer = getattr(user, 'customer_profile', None)  # Ensure the user has a customer profile
+        bookings = Bookings.objects.filter(owner=customer)  # Fetch bookings for the customer
+        
+        booking_id = request.POST.get('booking_id')  # Get movie_id from the form
+        movie = get_object_or_404(Bookings, id=booking_id)  # Ensure the booking exists
+        
+        # Create a new Payment object
         payment_obj = Payment.objects.create(
             card_name=request.POST.get('name'),
             card_number=request.POST.get('cardNo'),
             month=request.POST.get('month'),
             year=request.POST.get('year'),
             cvv_number=request.POST.get('ccv'),
+            booking=movie,
+            owner = customer , # Associate the payment with the booking
         )
+
         # Save the payment object and redirect if successful
         if payment_obj:
             payment_obj.save()
-            return redirect('confirmpage')
+            return redirect('confirmpage')  # Redirect to confirmation page
+
+    # Handle GET request or fallback
+    else:
+        user = request.user
+        customer = getattr(user, 'customer_profile', None)  # Ensure the user has a customer profile
+        bookings = Bookings.objects.filter(owner=customer) if customer else None  # Fetch bookings if customer exists
 
     return render(request, 'User/payment.html', {'bookings': bookings})
 
-
-def delete(request,id):
-    instance=Bookings.objects.get(pk=id)
-    instance.delete()
-    if request.method == 'POST':
-        return redirect('home')
-    dict_insert = {
-        'insert' : Bookings.objects.all()
-    }
-    return render(request,'User/payment.html',dict_insert)
 
 @login_required(login_url='login')
 def ticket(request,pk):

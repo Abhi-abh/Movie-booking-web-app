@@ -22,6 +22,16 @@ class Movie(models.Model):
 
     def __str__(self):
         return self.title
+    
+class UpcomingMovies(models.Model):
+    title = models.CharField(max_length=200)
+    price = models.FloatField()
+    language = models.CharField(max_length=200,default=0)
+    description = models.TextField()
+    image = models.ImageField(upload_to='images')
+
+    def __str__(self):
+            return self.title
 
 class Customer(models.Model):
     name = models.CharField(max_length=200)
@@ -49,6 +59,8 @@ class Bookings(models.Model):
 
 
 class Payment(models.Model):
+    booking = models.ForeignKey(Bookings, on_delete=models.CASCADE, null=True,related_name="bookings")
+    owner = models.ForeignKey(Customer,on_delete=models.SET_NULL,null=True)
     card_name = models.CharField(max_length=250)
     card_number = models.CharField(max_length=100)
     month = models.CharField(max_length=100)

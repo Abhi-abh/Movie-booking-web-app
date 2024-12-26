@@ -1,0 +1,130 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ user.username }}'s Profile</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #0e0b02; 
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            transition: background-color 0.5s; /* Smooth background color transition */
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            background: #2c2f33;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            justify-content: space-between;
+            padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            transition: background-color 0.3s; /* Smooth transition for navbar */
+        }
+
+        nav ul {
+            display: flex;
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline-block;
+            padding: 0 10px;
+        }
+
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav ul li a:hover {
+            color: #ff9800; /* Orange color on hover */
+            transition: color 0.5s, transform 0.5s; /* Smooth transition */
+            transform: scale(1.1);
+        }
+
+        .profile-container {
+            width: 90%;
+            max-width: 500px;
+            padding: 30px;
+            background: #fff; /* White background for profile */
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-top: 80px; 
+            opacity: 0; /* Start invisible for animation */
+            transform: translateY(20px); /* Start lower for effect */
+            animation: fadeInUp 1s forwards; /* Apply animation */
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1; /* Fade in */
+                transform: translateY(0); /* Move up to original position */
+            }
+        }
+
+        h1 {
+            color: #ff9800; /* Darker orange for title */
+            margin-bottom: 20px;
+            font-size: 24px;
+            transition: color 0.5s; /* Smooth transition for title color */
+        }
+
+        p {
+            font-size: 18px;
+            margin: 15px 0;
+        }
+
+        .btn-logout {
+            display: inline-block;
+            padding: 12px 25px;
+            font-size: 18px;
+            color: #ffffff;
+            background-color: #ff5722; /* Bright red-orange */
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .btn-logout:hover {
+            background-color: #e64a19; /* Darker shade on hover */
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <h2 class="logo">My Profile</h2>
+        <ul>
+          <li><a href="{% url 'home' %}">Back</a></li>
+        </ul>
+    </nav>
+    <div class="profile-container">
+        <h1>Welcome, {{ user.username }}</h1>
+        <p><strong>Name:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Date Joined:</strong> {{ user.date_joined|date:"F j, Y" }}</p>
+        <a href="{% url 'home' %}" class="btn-logout">OK</a>
+    </div>
+</body>
+</html>

@@ -12,8 +12,8 @@ urlpatterns = [
     path('login/',views.login,name='login'),
     path('ticket/<int:pk>/',views.ticket,name='ticket'),
     path('payment/',views.payment,name='payment'),
-    path('delete/<int:id>',views.delete,name='delete'),
     path('confirmpage/',views.confirmpage,name='confirmpage'),
+    path('profile_view/',views.profile_view,name='profile_view'),
     path('logout/',views.loggout,name='logout'),
 
 ]

@@ -1,0 +1,55 @@
+{% extends 'staff/base.html' %}
+{% block content %}
+{% load static %}
+
+
+<div class="container-fluid">
+<div id="carouselExampleDark" class="carousel carousel-dark slide mt-5" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+      <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+      <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="1" aria-label="Slide 2"></button>
+      <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="2" aria-label="Slide 3"></button>
+    </div>
+    <div class="carousel-inner">
+      <div class="carousel-item active" data-bs-interval="10000">
+        <a href="#movies"><img src="{% static '/images/Frame-2.png' %}" class="d-block w-100" alt="..."></a>       
+      </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon text-white" aria-hidden="true"></span>
+      <span class="visually-hidden bg-light">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+</div><br><br>
+
+   <!-- Movies  -->
+   <div class="movies text-white" id="movies">
+    <h2 class="heading">Opening This Week</h2>
+    <!-- Movies container  -->
+    
+    <div class="movies-container">
+        <!-- box-1  -->
+        {% for product in product %}
+        <div class="box">
+            <div class="box-img">
+               <img src="{{product.image.url}}" alt="">
+            </div>
+            <h3>{{product.title}}</h3>
+            <h3>{{product.price}}</h3>
+            <span>{{product.duration}}</span>
+            <td><button class="bg-primary"><a class="nav-link text-white" href="{% url 'edit' product.id %}">Edit</a></button></td>
+            <td><button class="bg-danger" onclick="return confirm('Are you sure you want to delete this booking?');"><a class="nav-link text-white"  href="{% url 'delete1' product.id %}">Delete</a></button></td>
+                        
+        </div>
+        {% endfor %}      
+    </div>
+    
+</div><br><br>
+
+
+
+{% endblock %}
