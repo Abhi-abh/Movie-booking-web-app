@@ -1,15 +1,16 @@
 {% extends 'staff/base.html' %}
 {% block content %}
+{% load crispy_forms_tags %}
 {% load static %}
 
-<div class="container items-align-center">
+<div class="container items-align-center w-50">
     <div class="container bg-primary mt-5">
     <h3 class=" fw-bold pt-4 text-center text-white">Insert movies Details</h3><br>
 </div>
     <div class="container bg-danger p-5">
     <form class="fw-bold" enctype="multipart/form-data" method="POST">
         {% csrf_token%}
-        {{form.as_p}}
+        {{form|crispy}}
     
         <button class="bg-success" type="submit">Submit</button>
     </form>

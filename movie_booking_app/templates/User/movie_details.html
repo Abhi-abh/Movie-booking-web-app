@@ -39,11 +39,12 @@
         </div>
         <div data-mdb-input-init class="form-outline mb-4">
             <label class="form-label">Booking Date</label>
-            <input class="form-control" type="date" placeholder="Date" name="Date" required>
-        </div>
+            <input class="form-control" type="date" placeholder="Date" name="Date" 
+                   min="{{ today }}" max="{{ current_year }}-12-31" required>
+        </div>             
         <div data-mdb-input-init class="form-outline mb-4">
             <label class="form-label">Seats</label>
-            <input class="form-control" type="number" placeholder="number" name="number" min="1" required>
+            <input class="form-control" type="number" placeholder="Enter number" name="number" min="1" max="100" required>
         </div>
         <div data-mdb-input-init class="form-outline mb-4">
             <label class="form-label">Booking Time</label>

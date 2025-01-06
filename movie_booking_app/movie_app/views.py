@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate,logout
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.utils.timezone import now
-from datetime import datetime
+from datetime import datetime,date
 import re
 import qrcode
 from io import BytesIO
@@ -36,6 +36,7 @@ def signup(request):
             my_user.save()
             customer=Customer.objects.create(
                 user=my_user,
+                name=uname,
                 phone=phone,
                 address=address
             )
@@ -89,7 +90,8 @@ def order(request):
 def movie_dlt(request,pk):
     product=Movie.objects.get(pk=pk)
     latest_list = Movie.objects.order_by('-id')[:5]
-    context={'product':product,'latest_list':latest_list}
+    current_year = date.today().year
+    context={'product':product,'latest_list':latest_list,'today': date.today().isoformat(),'current_year': current_year}
     return render(request,'User/movie_details.html',context)
 
 @login_required(login_url='login')
@@ -111,6 +113,10 @@ def booking(request):
             return render(request, 'User/booking.html')
 
         seats = int(seats)
+        if seats > 100:
+            messages.error(request, "You can only book a maximum of 100 tickets.")
+            return render(request, 'User/booking.html')
+
         selected_date = request.POST.get('Date')  # Get date from the form
         current_date = now().date()  # Get current date
 
