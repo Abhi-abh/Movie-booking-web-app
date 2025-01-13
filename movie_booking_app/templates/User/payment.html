@@ -85,12 +85,12 @@
         <form id="paymentForm" action="" method="POST">
           {% csrf_token %}
           <h2 class="text-black">Card Details</h2>
-          <input type="number" name="cardNo" maxlength="10" minlength="10"  pattern="\d{10}" placeholder="Card Number" required>
+          <input type="number" name="cardNo" min="10" minlength="10"  pattern="\d{10}" placeholder="Card Number" required>
           <br>
           <input type="text" name="name" placeholder="Name on the Card" required>
           <br>
-          <input type="number" id="small" name="month" placeholder="MM" max="99" title="Invalid Month" required>
-          <input type="number" id="small" name="year" placeholder="YY" max="12" title="Invalid year" required>
+          <input type="number" id="small" name="month" placeholder="MM" min="1" max="12" minlength="2" maxlength="2" pattern="^(0[1-9]|1[0-2])$" title="Invalid Month" required>
+          <input type="number" id="small" name="year" placeholder="YY" max="99" pattern="^\d{2}$" title="Invalid year" required>
           <br>
           <input type="password" name="ccv" placeholder="CCV" pattern="\d{3}" required>
           <input type="hidden" name="booking_id" value="{{ booking.id }}">

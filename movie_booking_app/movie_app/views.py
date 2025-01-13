@@ -10,7 +10,10 @@ from datetime import datetime,date
 import re
 import qrcode
 from io import BytesIO
+from calendar import monthrange
 from django.core.files.base import ContentFile
+from django.db.models import Sum
+from django.utils import timezone
 
 # Create your views here.
 
@@ -73,7 +76,9 @@ def contact(request):
         )
         if payment_obj:
             payment_obj.save()
+            messages.success(request, 'Form Successfully Submitted')
             return redirect('contact')
+            
     return render(request,'User/contact.html')
 
 def about(request):
@@ -87,22 +92,23 @@ def order(request):
     context = {'bookings': bookings}
     return render(request,'User/orders.html',context)
 
-def movie_dlt(request,pk):
-    product=Movie.objects.get(pk=pk)
+def movie_dlt(request, pk):
+    product = Movie.objects.get(pk=pk)
     latest_list = Movie.objects.order_by('-id')[:5]
-    current_year = date.today().year
-    context={'product':product,'latest_list':latest_list,'today': date.today().isoformat(),'current_year': current_year}
-    return render(request,'User/movie_details.html',context)
+    today = date.today()
+    current_date = now().date()
+    current_time = timezone.localtime(timezone.now()).time()
+    current_year = today.year
+    min_date = today.strftime("%Y-%m-%d")
+    max_date = date(today.year, today.month, monthrange(today.year, today.month)[1]).strftime("%Y-%m-%d")
 
-@login_required(login_url='login')
-def booking(request):
     if request.method == 'POST':
         user = request.user
         customer = getattr(user, 'customer_profile', None)  # Safely access customer_profile
 
         if not customer:
             messages.error(request, "Customer profile not found.")
-            return render(request, 'User/booking.html')
+            return redirect('movie_dlt', pk=pk)
 
         movie_id = request.POST.get('movie_id')  # Get movie_id from the form
         movie = get_object_or_404(Movie, id=movie_id)  # Fetch movie object safely
@@ -110,26 +116,44 @@ def booking(request):
 
         if not seats or not seats.isdigit():
             messages.error(request, "Invalid number of seats.")
-            return render(request, 'User/booking.html')
+            return redirect('movie_dlt', pk=pk)
 
         seats = int(seats)
-        if seats > 100:
-            messages.error(request, "You can only book a maximum of 100 tickets.")
-            return render(request, 'User/booking.html')
+        if seats <= 0:
+            messages.error(request, "Number of seats must be greater than zero.")
+            return redirect('movie_dlt', pk=pk)
 
         selected_date = request.POST.get('Date')  # Get date from the form
+        selected_time = request.POST.get('Time')  # Get time from the form
         current_date = now().date()  # Get current date
+        selected_time_obj = datetime.strptime(selected_time, '%I-%M %p').time()
+        selected_date_obj = datetime.strptime(selected_date, '%Y-%m-%d').date()
 
-        try:
-            selected_date_obj = datetime.strptime(selected_date, '%Y-%m-%d').date()
-        except ValueError:
-            messages.error(request, "Invalid date format. Please use YYYY-MM-DD.")
-            return render(request, 'User/booking.html')
 
-        # Validate selected date
-        if selected_date_obj < current_date:
-            messages.error(request, "You cannot book for past dates.")
-            return render(request, 'User/booking.html')
+        if not selected_time:
+            messages.error(request, "Please select a valid time.")
+            return redirect('movie_dlt', pk=pk)
+
+
+        if selected_date_obj == current_date:
+            if selected_time_obj <= current_time:
+                messages.error(request, "The booking is closed for the selected time.")
+                return redirect('movie_dlt', pk=pk)
+
+        # Check total seats booked for the selected movie, date, and time
+        total_booked_seats = (
+            Bookings.objects.filter(movie=movie, date=selected_date_obj, time=selected_time)
+            .aggregate(total=Sum('seats'))['total'] or 0
+        )
+        remaining_seats = 100 - total_booked_seats
+
+        if remaining_seats <= 0:
+            messages.error(request, "Tickets are not available for this time slot.")
+            return redirect('movie_dlt', pk=pk)
+
+        if seats > remaining_seats:
+            messages.error(request, f"Only {remaining_seats} seats are available for this time slot.")
+            return redirect('movie_dlt', pk=pk)
 
         # Calculate total price
         total_price = seats * movie.price
@@ -138,9 +162,9 @@ def booking(request):
         payment_obj = Bookings.objects.create(
             owner=customer,
             movie=movie,
-            date=selected_date,
+            date=selected_date_obj,
             seats=seats,
-            time=request.POST.get('Time'),
+            time=selected_time,
             total_price=total_price,
         )
 
@@ -149,7 +173,7 @@ def booking(request):
             f"Movie: {movie.title}\n"
             f"Tickets: {seats}\n"
             f"Date: {selected_date}\n"
-            f"Time: {request.POST.get('Time')}\n"
+            f"Time: {selected_time}\n"
             f"Total: {total_price}"
         )
         qr = qrcode.QRCode(
@@ -175,7 +199,16 @@ def booking(request):
         # Redirect to the payment page
         return redirect('payment')
 
-    return render(request, 'User/booking.html')
+    context = {
+        'product': product,
+        'latest_list': latest_list,
+        'today': date.today().isoformat(),
+        'current_year': current_year,
+        'min_date': min_date,
+        'max_date': max_date,
+    }
+    return render(request, 'User/movie_details.html', context)
+
 
 @login_required
 def profile_view(request):

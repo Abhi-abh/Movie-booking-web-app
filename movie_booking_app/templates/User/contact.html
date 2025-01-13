@@ -3,6 +3,34 @@
 {% load static %}
 
 <br><br>
+<style>
+    /* Styling for the success message overlay */
+    #successMessage {
+        display: none;
+        position: fixed;
+        top: 20%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #28a745;
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        z-index: 1000;
+    }
+    /* Overlay background to make it look more prominent */
+    #overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+</style>
 <div class="container-fluid mt-5 m-auto">
     <img src="{% static '/images/image 69.png' %}" style="width: 100%;" alt="">
     <div class="container mt-5 mb-5 text-center">
@@ -13,15 +41,28 @@
 <div class="container">
     <div class="row text-center">
         <div class="col-md-6 justify-content-center">
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <p {% if message.tags %} class="{{ message.tags }}"{% endif %} id="message">
+                        {{ message }}
+            </p>
+                {% endfor %}
+            </div>  
+        {% endif %} 
             <div style="border-radius: 20px;border: 1px solid var(--icon-color, #FFF);background: #1D1D1D;height: 400px;">
                 <form action="" method="post">
-                    {% csrf_token %} 
-                <h5 class="text-white mt-5 mb-2">Get in Touch</h5>
-                <input class="mt-2" style="width: 75%;" type="text" placeholder="Name" name="Name" required>
-                <input class="mt-2" style="width: 75%;" type="email" placeholder="E-mail" name="E-mail" required>
-                <textarea class="mt-2" style="width: 75%;" id="comments" placeholder="Description" name="Description" rows="4" cols="50" required></textarea>
-                <button class="mt-3 text-white" style="width: 30%;height: 10%;border-radius: 37.034px;background: #D60000;border: none;" type="submit">Submit</button>
+                    {% csrf_token %}
+                    <h5 class="text-white mt-5 mb-2">Get in Touch</h5>
+                    <input class="mt-2" style="width: 75%;" type="text" placeholder="Name" name="Name" required>
+                    <input class="mt-2" style="width: 75%;" type="email" placeholder="E-mail" name="E-mail" required>
+                    <textarea class="mt-2" style="width: 75%;" id="comments" placeholder="Description" name="Description" rows="4" cols="50" required></textarea>
+                    <button class="mt-3 text-white" style="width: 30%;height: 10%;border-radius: 37.034px;background: #D60000;border: none;" type="submit">Submit</button>
                 </form>
+            
+                <!-- Overlay and Success Message -->
+                <div id="overlay"></div>
+                <div id="successMessage">Form Submitted Successfully!</div>
             </div>
         </div>
         
@@ -60,10 +101,29 @@
     </div>
 </div>
 </div>
-</div><br><br>
+</div>
 <div class="text-center">
     <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d61094.22504385578!2d76.88848982313895!3d8.551040249042629!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30635ff06b92b791%3A0xd78c4fa1854213a6!2sIndia!5e0!3m2!1sen!2sin!4v1720504272434!5m2!1sen!2sin"  allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
 </div>
+<script>
+
+    // Show a popup (alert or custom modal)
+    window.onload = function() {
+        var messageElement = document.getElementById('message');
+        
+        // If the message exists, show the popup and hide it after 2 seconds
+        if (messageElement) {
+            // You can also replace this with a modal popup if you want a custom styled message.
+            alert(messageElement.textContent); // Simple alert box with the message
+            
+            // Hide the message after 2 seconds
+            setTimeout(function() {
+                messageElement.style.display = 'none';
+            }, 2000); // 2000 milliseconds = 2 seconds
+        }
+    }
+
+</script>
 </div>
 
 

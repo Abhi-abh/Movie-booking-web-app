@@ -32,19 +32,30 @@
 </div>
 </div>
 <div id="booking" class="div container fw-bold mt-5 mb-5 w-50 bg-light" style="border-radius: 5px;">
-    <form action="{% url 'booking' %}" method="post">
+    <form action="" method="post">
         {% csrf_token %} 
         <div class="text-center mt-5">
             <h2>Booking Form</h2>
         </div>
+        <!-- Messages Display -->
+        <div class="error mt-3">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
         <div data-mdb-input-init class="form-outline mb-4">
             <label class="form-label">Booking Date</label>
-            <input class="form-control" type="date" placeholder="Date" name="Date" 
-                   min="{{ today }}" max="{{ current_year }}-12-31" required>
-        </div>             
+            <input class="form-control" type="date" name="Date" 
+                   min="{{ min_date }}" max="{{ max_date }}" required>
+        </div>        
         <div data-mdb-input-init class="form-outline mb-4">
             <label class="form-label">Seats</label>
-            <input class="form-control" type="number" placeholder="Enter number" name="number" min="1" max="100" required>
+            <input class="form-control" type="number" placeholder="Enter number" name="number"  required>
         </div>
         <div data-mdb-input-init class="form-outline mb-4">
             <label class="form-label">Booking Time</label>
