@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate,logout
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
 from django.utils.timezone import now
 from datetime import datetime,date
 import re
@@ -60,13 +61,14 @@ def login(request):
             return redirect('login')
     return render(request,'User/login.html')
 
-
+never_cache
 def home(request):
     movie_list = Movie.objects.order_by('priority')
     up_movies = UpcomingMovies.objects.all()
     movie_dict = {'product':movie_list,'upmovies':up_movies}
     return render(request,'User/home.html',movie_dict)
 
+never_cache
 def contact(request):
     if request.method == 'POST':
         payment_obj = Contact.objects.create(
@@ -81,9 +83,11 @@ def contact(request):
             
     return render(request,'User/contact.html')
 
+never_cache
 def about(request):
     return render(request,'User/about.html')
 
+never_cache
 @login_required(login_url='login')
 def order(request):
     user=request.user
@@ -92,6 +96,7 @@ def order(request):
     context = {'bookings': bookings}
     return render(request,'User/orders.html',context)
 
+never_cache
 def movie_dlt(request, pk):
     product = Movie.objects.get(pk=pk)
     latest_list = Movie.objects.order_by('-id')[:5]
@@ -209,12 +214,13 @@ def movie_dlt(request, pk):
     }
     return render(request, 'User/movie_details.html', context)
 
-
+never_cache
 @login_required
 def profile_view(request):
     user = request.user  # Get the currently logged-in user
     return render(request, 'User/profile.html', {'user': user})
 
+never_cache
 @login_required(login_url='login')
 def payment(request):
     # Initialize `bookings` as an empty QuerySet or `None` to handle both POST and GET requests
@@ -252,17 +258,19 @@ def payment(request):
 
     return render(request, 'User/payment.html', {'bookings': bookings})
 
-
+never_cache
 @login_required(login_url='login')
 def ticket(request,pk):
     ticket=Bookings.objects.get(pk=pk)
     context={'ticket':ticket}
     return render(request,'User/ticket.html',context)
 
+never_cache
 @login_required(login_url='login')
 def confirmpage(request):
     return render(request,'User/confirmationpage.html')
 
+never_cache
 def loggout(request):
     logout(request)
     return redirect('login')

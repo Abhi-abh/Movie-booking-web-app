@@ -5,44 +5,75 @@
 <br><br>
 <div class="div container fw-bold mt-5 mb-5 bg-light w-50" style="border-radius: 5px;">
     <form action="" method="post">
-        {% csrf_token %} 
+        {% csrf_token %}
         <div class="text-center mt-5">
-        <h1>Signup</h1>
-    </div>
-    <div class="error">
-        {% if messages %}
-        {% for message in messages %}
+            <h1>Signup</h1>
+        </div>
+        <div class="error">
+            {% if messages %}
+            {% for message in messages %}
                 <p {% if message.tags %} class="{{ message.tags }}"{% endif %}>
                     {{ message }}
                 </p>
-        {% endfor %}
-         {% endif %}
+            {% endfor %}
+            {% endif %}
         </div>
-    <div data-mdb-input-init class="form-outline mb-4">
-        <label class="form-label" for="username">Username</label>
-        <input class="form-control" type="text" placeholder="Username" name="username" id="username" required>
+    
+        <div data-mdb-input-init class="form-outline mb-4">
+            <label class="form-label" for="username">Username</label>
+            <input class="form-control" type="text" placeholder="Username" name="username" id="username" required>
         </div>
+    
         <div data-mdb-input-init class="form-outline mb-4">
-        <label class="form-label" for="email">Email</label>
-        <input class="form-control" type="email" placeholder="Email or Phone" name="email" id="email" required>
-    </div>
+            <label class="form-label" for="email">Email</label>
+            <input class="form-control" type="email" placeholder="Email or Phone" name="email" id="email" required>
+        </div>
+    
+        <div data-mdb-input-init class="form-outline mb-4 position-relative">
+            <label class="form-label" for="password1">Password</label>
+            <input class="form-control" type="password" placeholder="Password" id="password1" name="password1" required>
+            <!-- Password toggle icon -->
+            <i id="toggle-password1" class="bi bi-eye-slash position-absolute" style="right: 10px; top: 38px; cursor: pointer;"></i>
+        </div>
+    
         <div data-mdb-input-init class="form-outline mb-4">
-        <label class="form-label" for="password1">Password</label>
-        <input class="form-control" type="password" placeholder="Password" id="password1" name="password1" required>
-    </div>
-        <div data-mdb-input-init class="form-outline mb-4">
-        <label class="form-label" for="adress">Address</label>
-        <input class="form-control" type="text" name="address" required placeholder="Address">
-    </div>
+            <label class="form-label" for="address">Address</label>
+            <input class="form-control" type="text" name="address" required placeholder="Address">
+        </div>
+    
         <div data-mdb-input-init class="form-outline mb-2">
-        <label class="form-label" for="phone">Phone Number</label>
-        <input class="form-control" type="text" name="phone" required placeholder="Phone Number">
-    </div>
+            <label class="form-label" for="phone">Phone Number</label>
+            <input class="form-control" type="text" name="phone" required placeholder="Phone Number">
+        </div>
+    
         <button type="submit" class="btn btn-primary btn-block mb-2 w-100">Signup</button>
+    
         <div class="container text-center">
-        <a class="text-primary" href="{% url 'login' %}" >I have already account</a>
-    </div>
+            <a class="text-primary" href="{% url 'login' %}">I have already account</a>
+        </div>
     </form>
+    
+    <!-- Add Bootstrap Icons (or another icon library) for the toggle -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <script>
+        // JavaScript to toggle password visibility
+        const togglePassword1 = document.getElementById('toggle-password1');
+        const passwordField1 = document.getElementById('password1');
+    
+        togglePassword1.addEventListener('click', function () {
+            // Toggle the type of the password field
+            if (passwordField1.type === 'password') {
+                passwordField1.type = 'text';
+                togglePassword1.classList.remove('bi-eye-slash');
+                togglePassword1.classList.add('bi-eye');
+            } else {
+                passwordField1.type = 'password';
+                togglePassword1.classList.remove('bi-eye');
+                togglePassword1.classList.add('bi-eye-slash');
+            }
+        });
+    </script>
     </div>
 
 {% endblock %}
